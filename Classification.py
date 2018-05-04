@@ -63,5 +63,5 @@ class Classifier:
         self.network = MLPClassifier(hidden_layer_sizes=(350,160,50)) #do not change, optimalized
         self.network.fit(self.train_input_neural_net, self.train_target_neural_net)
 
-    def neural_network_prediction(self, input):
-        return self.network.predict_proba(input)
+    def neural_network_prediction(self, inputs):
+        return self.network.predict(inputs)

@@ -1,6 +1,7 @@
 import io
 import os
 from scipy import misc
+import cv2
 #Todo: Implement A filereader to convert from image to array in n*m format
 
 def get_all_photos():
@@ -25,8 +26,8 @@ def get_all_photos():
 def get_detection_images():
     directory1 = "\detection-images\detection-1.jpg"
     directory2 = "\detection-images\detection-2.jpg"
-    jpg1= misc.imread(os.getcwd()+directory1)
-    jpg2= misc.imread(os.getcwd()+directory2)
+    jpg1= cv2.imread(os.getcwd()+directory1)
+    jpg2= cv2.imread(os.getcwd()+directory2)
     return jpg1, jpg2
 
 # potentially new file reader method
