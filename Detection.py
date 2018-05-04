@@ -11,41 +11,32 @@ from skimage import io, filters, exposure
 
 letters = 'abcdefghijklmnopqrstuvwxyz'
 
-class Detector:
-	def __init__(self,size_x=20,size_y=20,step=4):
-		self.images=get_detection_images()
-		self.size_x=size_x
-		self.size_y=size_y
-		self.subsamples=[] #list of as cases
+class Detector: # main class for handeling detection using sliding window and ANN for prediction
+	def __init__(self):  
+		self.images=get_detection_images() #load from FileReader
 
-	def set_picture(self,num): #(200,200) and (300,600)
+	def set_picture(self,num): #(200,200) and (300,600) two pictures
 		self.current_image=self.images[num]
-		#self.frame_x,self.frame_y=self.current_image.shape
 
-	def train_ANN(self):
+	def train_ANN(self): #training neural networks with examples from chars74k-lite
 		self.classification=Classification.Classifier()
 		self.classification.train_neural_network()
-		print("Saving weights")
 		_ = joblib.dump(self.classification.network, "classification_weights.pkl", compress=9)
-		print("Done saving weights")
+		# storing to file for mobility in testing
 
 	def load_weights(self): #used for mobility in testing
 		self.classification=Classification.Classifier()
 		self.classification.network = joblib.load("classification_weights.pkl")
 
-	def test_ANN(self):
-		self.test_results=self.classification.neural_network_prediction(self.subsamples)
-
-	def get_frames(self): # potentially change variable names
+	def get_frames(self): # creates frames using sliding window detection
 		graytones = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
-		ret, im_th = cv2.threshold(graytones, 252, 255, cv2.THRESH_BINARY_INV)
-		image, ctrs, hier = cv2.findContours(im_th.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+		ret, tresh = cv2.threshold(graytones, 252, 255, cv2.THRESH_BINARY_INV)
+		image, ctrs, hier = cv2.findContours(tresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 		self.rects = [cv2.boundingRect(ctr) for ctr in ctrs]
-		self.rects = sorted(self.rects, key = lambda x: (x[0] + 20*x[1]))
 		for rect in self.rects:
 			cv2.rectangle(self.current_image, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 1)
 
-	def generate_patches(self): 
+	def generate_patches(self): # generates patches for testing
 		detected_images = []
 		for rect in self.rects:
 			x_1, y_1, x_size, y_size = rect
@@ -58,7 +49,7 @@ class Detector:
 			detected_images.append(temp_image)
 		self.detected_images = np.array(detected_images)
 
-	def predict_images(self):
+	def predict_images(self): #predicts patch classification based on neural network
 		preds = []
 		for i, im in enumerate(self.detected_images):
 			im = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
@@ -75,7 +66,7 @@ class Detector:
 		io.imshow(self.current_image)
 		io.show()
 	
-	def run(self):
+	def run(self): # main method for running detection and prediction
 		self.train_ANN()
 		self.set_picture(0)
 		self.get_frames()
@@ -85,15 +76,3 @@ class Detector:
 		self.get_frames()
 		self.generate_patches()
 		self.predict_images()
-
-def test():
-	d=Detector()
-	d.load_weights()
-	d.set_picture(1)
-	d.get_frames()
-	d.generate_patches()
-	d.predict_images()
-	return d
-#should train on full set
-
-#TODO: Implement sliding windows algorithm
