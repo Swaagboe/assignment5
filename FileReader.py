@@ -22,3 +22,12 @@ def get_all_photos():
             images[directory].append(jpg)
 
     return images
+
+def get_detection_images():
+    directory1 = "\detection-images\detection-1.jpg"
+    directory2 = "\detection-images\detection-2.jpg"
+    jpg1= misc.imread(os.getcwd()+directory1)
+    jpg2= misc.imread(os.getcwd()+directory2)
+    return jpg1, jpg2
+
+# potentially new file reader method

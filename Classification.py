@@ -52,26 +52,21 @@ class Classifier:
         a=0
 
     def do_neural_network(self):
-        network = MLPClassifier(hidden_layer_sizes=(350,160,50))
+        # potentially make network variable into intrinsic
+        network = MLPClassifier(hidden_layer_sizes=(350,160,50)) #do not change, optimalized
         network.fit(self.train_input_neural_net, self.train_target_neural_net)
         prediction = network.predict(self.test_input)
         accuracy = sklearn.metrics.accuracy_score(self.test_target_neural_net, prediction)
         print("Accuracy neural net: " + str(accuracy))
 
+    def train_neural_network(self):
+        self.network = MLPClassifier(hidden_layer_sizes=(350,160,50)) #do not change, optimalized
+        self.network.fit(self.train_input_neural_net, self.train_target_neural_net)
+
+    def neural_network_prediction(self, input):
+        return self.network.predict(input)
 
 
-
-
-
-
-
-
-c = Classifier()
-c.do_knn()
-#c.do_svm()
-c.do_random_forest()
-c.do_neural_network()
-a = 0
 
 
 
