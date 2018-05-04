@@ -6,18 +6,26 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import confusion_matrix
 import sklearn.metrics
+from sklearn.neural_network import MLPClassifier
 
 
 class Classifier:
 
     def __init__(self):
         case_manager = cm.CaseManager()
+        case_manager.initialize()
         self.train_input, self.train_target = case_manager.get_training_input_matrix_and_targets()
         self.test_input, self.test_target = case_manager.get_test_input_matrix_and_targets()
+
+        case_manager_neural_net = cm.CaseManager()
+        case_manager_neural_net.initialize_for_neural_net()
+        self.train_input_neural_net, self.train_target_neural_net = case_manager_neural_net.get_training_input_matrix_and_targets()
+        self.test_input_neural_net, self.test_target_neural_net = case_manager_neural_net.get_test_input_matrix_and_targets()
+
         a = 0
 
     def do_knn(self):
-        knn = KNeighborsClassifier(n_neighbors=20)
+        knn = KNeighborsClassifier(n_neighbors=15)
         knn.fit(self.train_input, self.train_target)
         prediction = knn.predict(self.test_input)
         conf_matrix = confusion_matrix(self.test_target, prediction)
@@ -26,7 +34,7 @@ class Classifier:
         a=0
 
     def do_svm(self):
-        support_vector_machine = SVC(gamma=0.001)
+        support_vector_machine = SVC(gamma = 0.003)
         support_vector_machine.fit(self.train_input, self.train_target)
         prediction = support_vector_machine.predict(self.test_input)
         conf_matrix = confusion_matrix(self.test_target, prediction)
@@ -44,7 +52,13 @@ class Classifier:
         a=0
 
     def do_neural_network(self):
-        neural_network =
+        network = MLPClassifier(hidden_layer_sizes=(350,160,50))
+        network.fit(self.train_input_neural_net, self.train_target_neural_net)
+        prediction = network.predict(self.test_input)
+        accuracy = sklearn.metrics.accuracy_score(self.test_target_neural_net, prediction)
+        print("Accuracy neural net: " + str(accuracy))
+
+
 
 
 
@@ -56,6 +70,7 @@ c = Classifier()
 c.do_knn()
 #c.do_svm()
 c.do_random_forest()
+c.do_neural_network()
 a = 0
 
 

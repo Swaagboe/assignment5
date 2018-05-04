@@ -12,11 +12,14 @@ class CaseManager:
         self.cases = []
         self.training_cases = []
         self.test_cases= []
-        self.initialize()
 
 
     def initialize(self):
         self.collect_cases()
+        self.split_into_training_and_test_set()
+
+    def initialize_for_neural_net(self):
+        self.collect_cases_for_neural_net()
         self.split_into_training_and_test_set()
 
     def collect_cases(self):
@@ -27,6 +30,17 @@ class CaseManager:
                 target = letter_type
                 photo = images[letter_type][image]
                 enhanced_photo = ImageEnhancer.enhance_image(photo)
+                case = Case.Case(enhanced_photo, target)
+                self.cases[letter_type].append(case)
+
+    def collect_cases_for_neural_net(self):
+        images = FileReader.get_all_photos()
+        for letter_type in range(len(images)):
+            self.cases.append([])
+            for image in range(len(images[letter_type])):
+                target = letter_type
+                photo = images[letter_type][image]
+                enhanced_photo = ImageEnhancer.enhance_image_neural_net(photo)
                 case = Case.Case(enhanced_photo, target)
                 self.cases[letter_type].append(case)
 
