@@ -29,7 +29,7 @@ class Detector:
 		_ = joblib.dump(self.classification.network, "classification_weights.pkl", compress=9)
 		print("Done saving weights")
 
-	def load_weights(self):
+	def load_weights(self): #used for mobility in testing
 		self.classification=Classification.Classifier()
 		self.classification.network = joblib.load("classification_weights.pkl")
 
@@ -37,8 +37,8 @@ class Detector:
 		self.test_results=self.classification.neural_network_prediction(self.subsamples)
 
 	def get_frames(self): # potentially change variable names
-		im_gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
-		ret, im_th = cv2.threshold(im_gray, 252, 255, cv2.THRESH_BINARY_INV)
+		graytones = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
+		ret, im_th = cv2.threshold(graytones, 252, 255, cv2.THRESH_BINARY_INV)
 		image, ctrs, hier = cv2.findContours(im_th.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 		self.rects = [cv2.boundingRect(ctr) for ctr in ctrs]
 		self.rects = sorted(self.rects, key = lambda x: (x[0] + 20*x[1]))
@@ -46,17 +46,17 @@ class Detector:
 			cv2.rectangle(self.current_image, (rect[0], rect[1]), (rect[0] + rect[2], rect[1] + rect[3]), (0, 255, 0), 1)
 
 	def generate_patches(self): 
-		images = []
+		detected_images = []
 		for rect in self.rects:
-			x1, y1, x_size, y_size = rect
-			x2 = x1+x_size
-			y2 = y1+y_size
+			x_1, y_1, x_size, y_size = rect
+			x_2 = x_1+x_size
+			y_2 = y_1+y_size
 			temp_image = []
-			rows = self.current_image[y1:y2]
+			rows = self.current_image[y_1:y_2]
 			for row in rows:
-				temp_image.append(row[x1:x2])
-			images.append(temp_image)
-		self.detected_images = np.array(images)
+				temp_image.append(row[x_1:x_2])
+			detected_images.append(temp_image)
+		self.detected_images = np.array(detected_images)
 
 	def predict_images(self):
 		preds = []
@@ -66,17 +66,25 @@ class Detector:
 			input_vector = []
 			for row in im:
 				input_vector.extend(row)
-
 			pred = self.classification.neural_network_prediction([input_vector])
 			pred = letters[pred[0]]
-
 			preds.append((self.rects[i], pred))
 
 		for rect, pred in preds:
 			cv2.putText(self.current_image, pred, (rect[0], rect[1]-10), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 0, 0), 1)
 		io.imshow(self.current_image)
 		io.show()
-			
+	
+	def run(self):
+		self.train_ANN()
+		self.set_picture(0)
+		self.get_frames()
+		self.generate_patches()
+		self.predict_images()
+		self.set_picture(1)
+		self.get_frames()
+		self.generate_patches()
+		self.predict_images()
 
 def test():
 	d=Detector()
