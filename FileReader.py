@@ -20,7 +20,6 @@ def get_all_photos():
             file_dir = rootdir + "/" + dir_name + "/" + file_name
             jpg = misc.imread(file_dir)
             images[directory].append(jpg)
-
     return images
 
 def get_detection_images():

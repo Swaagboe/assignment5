@@ -1,7 +1,7 @@
 from skimage import filters
 
 
-def enhance_image(photo):
+def enhance_image(photo): #From jpg pictures to black and white vectors
     photo_new = []
 
     val= filters.threshold_otsu(photo)
@@ -72,6 +72,4 @@ def make_letter_black_neural_net(photo):
         for i in range(len(photo)):
             for j in range(len(photo[i])):
                 photo[i][j] = 1 - photo[i][j]
-
-
 

@@ -64,26 +64,4 @@ class Classifier:
         self.network.fit(self.train_input_neural_net, self.train_target_neural_net)
 
     def neural_network_prediction(self, input):
-        return self.network.predict(input)
-
-
-
-
-
-
-
-
-
-
-
-
-class Algorithm1:
-
-    def __init__(self):
-        pass
-
-
-# Second algorithm for letter classification
-class Algorithm2:
-    def __init__(self):
-        pass
+        return self.network.predict_proba(input)

@@ -5,11 +5,11 @@ from random import shuffle
 
 
 
-#A casemanager that has control over test, training and validationset
+#A casemanager that has control over test, training and validation-set
 class CaseManager:
 
     def __init__(self):
-        self.cases = []
+        self.cases = [] # list of case-class-obj.
         self.training_cases = []
         self.test_cases= []
 
@@ -33,7 +33,8 @@ class CaseManager:
                 case = Case.Case(enhanced_photo, target)
                 self.cases[letter_type].append(case)
 
-    def collect_cases_for_neural_net(self):
+    def collect_cases_for_neural_net(self): #Only used for neural nw
+    # reads file, enhances images and distributes to list
         images = FileReader.get_all_photos()
         for letter_type in range(len(images)):
             self.cases.append([])
@@ -44,7 +45,7 @@ class CaseManager:
                 case = Case.Case(enhanced_photo, target)
                 self.cases[letter_type].append(case)
 
-    def split_into_training_and_test_set(self):
+    def split_into_training_and_test_set(self): # 20 % of each letter
         for letter_cases in self.cases:
             shuffle(letter_cases)
             number_of_test_cases = int(round(len(letter_cases)*0.2))
@@ -55,7 +56,7 @@ class CaseManager:
                 training_case = letter_cases[i]
                 self.training_cases.append(training_case)
 
-    def get_training_input_matrix_and_targets(self):
+    def get_training_input_matrix_and_targets(self): #adopt to framework
         input_matrix = []
         targets_vector = []
         for case in self.training_cases:
@@ -64,7 +65,7 @@ class CaseManager:
 
         return input_matrix, targets_vector
 
-    def get_test_input_matrix_and_targets(self):
+    def get_test_input_matrix_and_targets(self): #adopt to framework
         input_matrix = []
         targets_vector = []
         for case in self.test_cases:
@@ -73,7 +74,12 @@ class CaseManager:
 
         return input_matrix, targets_vector
 
-
+def collect_and_enhance(photoList):# static method, takes the list of test data and creates object to put into NN
+    input_matrix = []
+    for i in range(len(photoList)):
+        enhanced_photo = ImageEnhancer.enhance_image_neural_net(photoList[i])
+        input_matrix.append(enhanced_photo)
+    return input_matrix
 
 
 
